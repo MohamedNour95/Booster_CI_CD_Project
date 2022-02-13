@@ -1,0 +1,10 @@
+FROM ubuntu:latest
+RUN apt-get update && \
+    apt install -yq openssh-server openjdk-8-jdk && \
+    useradd -mU jenkins
+WORKDIR /home/jenkins    
+RUN mkdir .ssh
+COPY ./authorized_keys /home/jenkins/.ssh
+RUN chown -R jenkins:jenkins /home/jenkins && \
+    service ssh start
+CMD ["/bin/bash"]    
