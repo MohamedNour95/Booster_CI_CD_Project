@@ -1,10 +1,12 @@
 FROM ubuntu:latest
 RUN apt-get update && \
-    apt install -yq openssh-server openjdk-8-jdk && \
+    apt install -yq openssh-server openjdk-8-jdk git && \
     useradd -mU jenkins
 WORKDIR /home/jenkins    
 RUN mkdir .ssh
 COPY ./authorized_keys /home/jenkins/.ssh
 RUN chown -R jenkins:jenkins /home/jenkins && \
     service ssh start
-CMD ["/bin/bash"]    
+CMD ["/bin/bash"]
+# here i use the host resources by volume maping to run docker inside the container 
+# docker run -d -t --name slave -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker mohamednour95/jenkins_slave:latest

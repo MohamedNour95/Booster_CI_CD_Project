@@ -15,11 +15,12 @@ pipeline {
             }
         }
         stage('Push image') {
-            withCredentials([usernamePassword(credentialsId: 'docker'), passwordVariable: 'password', usernameVariable: 'user_name')])
             steps {
-                sh 'echo Push image'
-                sh "echo $pawwsord |docker login -u $user_name -p --password-stdin"
-                sh 'docker push mohamednour95/ubuntu_py3 '
+                withCredentials([usernamePassword(credentialsId:"docker",usernameVariable:"USERNAME",passwordVariable:"PASSWORD")]) {
+                    sh 'echo Push image'
+                    sh "docker login -u ${USERNAME} -p ${PASSWORD}"
+                    sh 'docker push mohamednour95/ubuntu_py3 '
+                }    
             }
         }
         stage('Deploy') {
@@ -31,17 +32,16 @@ pipeline {
         stage('Notification') {
             steps {
                 sh 'echo Notification'                                
-            }
-            post {
-                success {
-                    slackSend (color: '#00FF00', message: "SUCCESSFUL")
+                post {
+                    success {
+                        slackSend (color: '#00FF00', message: "SUCCESS")
+                    }
+                                
+                    failure {
+                        slackSend (color: '#FF0000', message: "FAILED")
+                    }
                 }
             }
-            post {
-                failure {
-                    slackSend (color: '#FF0000', message: "FAILED")
-                }
-            }
-        }
+        }    
     }
 }
